@@ -29,14 +29,6 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
-if(process.env.NODE_ENV==="production"){
-  app.use(express.static(path.join(__dirname,"../frontend/dist"))); 
-
-  app.get("*",(req,res)=>{
-    res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
-  })
-}
-
 app.get("/favicon.ico", (req, res) => res.sendStatus(204));
 app.get("/", (req, res) => {
   res.send("Welcome to Home Route");
@@ -51,6 +43,18 @@ app.get("/debug/online-users", (req, res) => {
       socketCount: sockets.size
     }))
   });
+});
+
+if(process.env.NODE_ENV==="production"){
+  app.use(express.static(path.join(__dirname,"../frontend/dist"))); 
+}
+
+app.get("*",(req,res)=>{
+  if(process.env.NODE_ENV==="production"){
+    res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
+  } else {
+    res.send("Route not found");
+  }
 });
 
 const server = http.createServer(app);
