@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/users", protectRoute, getUsersForSidebar);
 router.get("/:id", protectRoute, getMessages);
-router.post("/send/:id", protectRoute, upload.single('image'), sendMessage);
+router.post("/send", protectRoute, upload.single('image'), sendMessage);
 router.delete("/:id", protectRoute, deleteMessage);
 
 export default router;
