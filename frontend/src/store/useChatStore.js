@@ -85,19 +85,40 @@ export const useChatStore = create((set, get) => ({
       messages: [...state.messages, tempMessage],
     }));
     
-    const socketData = {
-      senderId: authUser._id,
-      receiverId: selectedUser._id,
-      text: messageData.text,
-      image: messageData.image,
-    };
-    
-    console.log("🔍 DEBUG - Emitting socket data:", {
-      hasImage: !!socketData.image,
-      imageLength: socketData.image?.length || 0
-    });
-    
-    socket.emit("send_message", socketData);
+    try {
+      // Use HTTP API for sending messages with images
+      const response = await axiosInstance.post("/message/send", {
+        receiverId: selectedUser._id,
+        text: messageData.text,
+        image: messageData.image,
+      });
+      
+      console.log("🔍 DEBUG - Message sent via HTTP:", response.data);
+      
+      // Update temp message with real message
+      set((state) => ({
+        messages: state.messages.map(msg => 
+          msg._id === tempMessage._id ? response.data : msg
+        ),
+      }));
+      
+      // Emit socket event for real-time updates
+      socket.emit("send_message", {
+        senderId: authUser._id,
+        receiverId: selectedUser._id,
+        text: messageData.text,
+        image: messageData.image,
+      });
+      
+    } catch (error) {
+      console.error("🔍 DEBUG - Error sending message:", error);
+      toast.error("Failed to send message. Please try again.");
+      
+      // Remove temp message on error
+      set((state) => ({
+        messages: state.messages.filter(msg => msg._id !== tempMessage._id),
+      }));
+    }
   },
 
   deleteMessage: async (messageId) => {

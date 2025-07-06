@@ -41,12 +41,13 @@ export const getMessages = async (req,res)=>{
 
 export const sendMessage = async (req,res)=>{
     try{
-        const {text, receiverId} = req.body;
+        const {text, receiverId, image} = req.body;
         const senderId = req.user._id;
 
         let imageUrl;
 
         if (req.file) {
+            // Handle file upload via multer
             const stream = Readable.from(req.file.buffer);
             
             const uploadResponse = await new Promise((resolve, reject) => {
@@ -64,6 +65,22 @@ export const sendMessage = async (req,res)=>{
             });
             
             imageUrl = uploadResponse.secure_url;
+        } else if (image && image.startsWith('data:image')) {
+            // Handle base64 image data from frontend
+            const uploadResponse = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload(
+                    image,
+                    {
+                        folder: "chat-images",
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+            });
+            
+            imageUrl = uploadResponse.secure_url;
         }
 
         const newMessage = new Message({
@@ -78,6 +95,7 @@ export const sendMessage = async (req,res)=>{
         res.status(201).json(newMessage);
 
     }catch(err){
+        console.error("🔍 DEBUG - Error in sendMessage:", err);
         res.status(500).json({message : "Internal error occured"});
     }
 }
