@@ -3,6 +3,12 @@ import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import { Readable } from 'stream';
 
+// Import socket.io instance (we'll need to pass it from index.js)
+let io = null;
+export const setSocketIO = (socketIO) => {
+  io = socketIO;
+};
+
 export const getUsersForSidebar = async (req,res)=>{
     try{
         const loggedInUserId = req.user._id;
@@ -92,6 +98,11 @@ export const sendMessage = async (req,res)=>{
         
         await newMessage.save();
 
+        // Emit socket event for real-time updates
+        if (io) {
+            io.to(receiverId).to(senderId).emit("receive_message", newMessage);
+        }
+
         res.status(201).json(newMessage);
 
     }catch(err){
@@ -115,6 +126,12 @@ export const deleteMessage = async (req, res) => {
             return res.status(403).json({ message: "Not authorized to delete this message" });
         }
         await Message.findByIdAndDelete(messageId);
+        
+        // Emit socket event for real-time updates
+        if (io) {
+            io.to(message.receiverId).to(message.senderId).emit("delete_message", { messageId });
+        }
+        
         res.status(200).json({ message: "Message deleted successfully" });
     } catch (err) {
         res.status(500).json({ message: "Internal error occurred" });

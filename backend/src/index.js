@@ -9,6 +9,7 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import Message from "./models/message.model.js";
 import path from "path";
+import { setSocketIO } from "./controllers/message.controller.js";
 
 dotenv.config({ path: './.env' });
 
@@ -69,6 +70,9 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+
+// Set socket.io instance in message controller
+setSocketIO(io);
 
 const onlineUsers = new Set();
 const userSockets = new Map();

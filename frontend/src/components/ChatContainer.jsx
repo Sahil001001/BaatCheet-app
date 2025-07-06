@@ -123,8 +123,9 @@ const ChatContainer = () => {
                   <img
                     src={message.image}
                     alt="Attachment"
-                    className="sm:max-w-[200px] rounded-md mb-2 cursor-zoom-in"
+                    className="max-w-[200px] sm:max-w-[250px] rounded-md mb-2 cursor-zoom-in"
                     onClick={() => setZoomedImage(message.image)}
+                    style={{ maxHeight: '300px', objectFit: 'cover' }}
                   />
                   <a
                     href={message.image}

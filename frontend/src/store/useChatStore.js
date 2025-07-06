@@ -102,13 +102,8 @@ export const useChatStore = create((set, get) => ({
         ),
       }));
       
-      // Emit socket event for real-time updates
-      socket.emit("send_message", {
-        senderId: authUser._id,
-        receiverId: selectedUser._id,
-        text: messageData.text,
-        image: messageData.image,
-      });
+      // No need to emit socket event since HTTP API already handles it
+      // Socket event will be handled by the receiver's socket connection
       
     } catch (error) {
       console.error("🔍 DEBUG - Error sending message:", error);
