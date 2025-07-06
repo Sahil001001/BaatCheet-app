@@ -22,7 +22,9 @@ app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: process.env.NODE_ENV === "production" 
+    ? ["https://baatcheet-web-app.onrender.com", "https://*.onrender.com"]
+    : ["http://localhost:5173", "http://localhost:5174"],
   credentials: true,
 }));
 
@@ -61,7 +63,9 @@ app.get("*",(req,res)=>{
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: process.env.NODE_ENV === "production" 
+      ? ["https://baatcheet-web-app.onrender.com", "https://*.onrender.com"]
+      : ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
   },
 });
@@ -76,12 +80,10 @@ io.on("connection", (socket) => {
     userSockets.get(userId).add(socket.id);
     onlineUsers.add(userId);
     
-    setTimeout(() => {
-      const onlineUsersArray = Array.from(onlineUsers).map(id => String(id));
-      io.emit("online_users", onlineUsersArray);
-    }, 100);
-    
     socket.data.userId = userId;
+    
+    const onlineUsersArray = Array.from(onlineUsers).map(id => String(id));
+    io.emit("online_users", onlineUsersArray);
   });
 
   socket.on("disconnecting", () => {
@@ -91,12 +93,21 @@ io.on("connection", (socket) => {
       if (userSockets.get(userId).size === 0) {
         userSockets.delete(userId);
         onlineUsers.delete(userId);
+        const onlineUsersArray = Array.from(onlineUsers).map(id => String(id));
+        io.emit("online_users", onlineUsersArray);
       }
     }
   });
 
   socket.on("disconnect", () => {
     const userId = socket.data.userId;
+    if (userId && userSockets.has(userId)) {
+      userSockets.get(userId).delete(socket.id);
+      if (userSockets.get(userId).size === 0) {
+        userSockets.delete(userId);
+        onlineUsers.delete(userId);
+      }
+    }
     const onlineUsersArray = Array.from(onlineUsers).map(id => String(id));
     io.emit("online_users", onlineUsersArray);
   });
