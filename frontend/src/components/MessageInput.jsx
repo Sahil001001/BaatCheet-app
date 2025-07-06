@@ -101,19 +101,19 @@ const MessageInput = () => {
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
+            className={`flex btn btn-circle btn-sm sm:btn-md
                      ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Image size={20} />
+            <Image size={18} className="sm:size-5" />
           </button>
         </div>
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-sm sm:btn-md btn-circle"
           disabled={!text.trim() && !imageFile}
         >
-          <Send size={22} />
+          <Send size={18} className="sm:size-5" />
         </button>
       </form>
     </div>
