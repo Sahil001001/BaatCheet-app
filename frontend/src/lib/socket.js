@@ -14,39 +14,39 @@ export const socket = io(
 );
 
 socket.on("connect", () => {
-  // console.log("🔍 DEBUG - Socket connected successfully, ID:", socket.id);
+  console.log("🔍 DEBUG - Socket connected successfully, ID:", socket.id);
 });
 
 socket.on("disconnect", (reason) => {
-  // console.log("🔍 DEBUG - Socket disconnected, reason:", reason);
+  console.log("🔍 DEBUG - Socket disconnected, reason:", reason);
 });
 
 socket.on("connect_error", (error) => {
-  // console.error("🔍 DEBUG - Socket connection error:", error);
+  console.error("🔍 DEBUG - Socket connection error:", error);
 });
 
 socket.on("reconnect", (attemptNumber) => {
-  // console.log("🔍 DEBUG - Socket reconnected after", attemptNumber, "attempts");
+  console.log("🔍 DEBUG - Socket reconnected after", attemptNumber, "attempts");
 });
 
 socket.on("reconnect_error", (error) => {
-  // console.error("🔍 DEBUG - Socket reconnection error:", error);
+  console.error("🔍 DEBUG - Socket reconnection error:", error);
 });
 
 socket.on("reconnect_failed", () => {
-  // console.error("🔍 DEBUG - Socket reconnection failed");
+  console.error("🔍 DEBUG - Socket reconnection failed");
 });
 
 export const connectSocket = () => {
   if (socket.disconnected) {
-    // console.log("🔍 DEBUG - Manually connecting socket");
+    console.log("🔍 DEBUG - Manually connecting socket");
     socket.connect();
   }
 };
 
 export const disconnectSocket = () => {
   if (socket.connected) {
-    // console.log("🔍 DEBUG - Manually disconnecting socket");
+    console.log("🔍 DEBUG - Manually disconnecting socket");
     socket.disconnect();
   }
 }; 

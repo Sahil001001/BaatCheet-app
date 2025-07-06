@@ -22,7 +22,7 @@ export const useAuthStore = create((set, get) => {
     connectionCheckInterval: null,
 
     setOnlineUsers: (users) => {
-      set({ onlineUsers: users });
+      set({ onlineUsers: users || [] });
     },
 
     subscribeToOnlineUsers: () => {
@@ -56,12 +56,11 @@ export const useAuthStore = create((set, get) => {
       try {
         const res = await axiosInstance.get("/auth/check");
         if (res.data) {
-          if (socket.disconnected) {
-            connectSocket();
-          }
           set({ authUser: res.data, isCheckingAuth: false });
           
-          if (socket.connected) {
+          if (socket.disconnected) {
+            connectSocket();
+          } else if (socket.connected) {
             socket.emit("join", res.data._id);
           }
         } else {
@@ -81,9 +80,7 @@ export const useAuthStore = create((set, get) => {
         
         if (socket.disconnected) {
           connectSocket();
-        }
-        
-        if (socket.connected) {
+        } else if (socket.connected) {
           socket.emit("join", res.data._id);
         }
         
@@ -100,6 +97,13 @@ export const useAuthStore = create((set, get) => {
       try {
         const res = await axiosInstance.post("/auth/signup", data);
         set({ authUser: res.data });
+        
+        if (socket.disconnected) {
+          connectSocket();
+        } else if (socket.connected) {
+          socket.emit("join", res.data._id);
+        }
+        
         toast.success("Account created successfully");
       } catch (error) {
         toast.error(error.response?.data?.message || "Signup failed");
