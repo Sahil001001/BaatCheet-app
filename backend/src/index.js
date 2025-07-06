@@ -30,9 +30,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
 app.get("/favicon.ico", (req, res) => res.sendStatus(204));
-app.get("/", (req, res) => {
-  res.send("Welcome to Home Route");
-});
 
 app.get("/debug/online-users", (req, res) => {
   const onlineUsersArray = Array.from(onlineUsers).map(id => String(id));
@@ -47,6 +44,10 @@ app.get("/debug/online-users", (req, res) => {
 
 if(process.env.NODE_ENV==="production"){
   app.use(express.static(path.join(__dirname,"../frontend/dist"))); 
+} else {
+  app.get("/", (req, res) => {
+    res.send("Welcome to Home Route");
+  });
 }
 
 app.get("*",(req,res)=>{
