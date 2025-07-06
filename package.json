@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "bson": "^6.10.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "lodash": "^4.17.21",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21"
+  },
+  "name": "real-time-chat-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build":"npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start":"npm run start --prefix backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
