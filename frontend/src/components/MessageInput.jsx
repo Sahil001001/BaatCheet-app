@@ -12,15 +12,34 @@ const MessageInput = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+    
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
+    
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    console.log("🔍 DEBUG - Image selected:", {
+      name: file.name,
+      size: file.size,
+      type: file.type
+    });
 
     setImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
+      console.log("🔍 DEBUG - Image preview loaded, length:", reader.result.length);
+    };
+    reader.onerror = () => {
+      toast.error("Failed to load image preview");
     };
     reader.readAsDataURL(file);
   };

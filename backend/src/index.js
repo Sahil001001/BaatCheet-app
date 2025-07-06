@@ -113,14 +113,28 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_message", async (data) => {
+    console.log("🔍 DEBUG - Received socket message:", {
+      senderId: data.senderId,
+      receiverId: data.receiverId,
+      hasText: !!data.text,
+      hasImage: !!data.image,
+      imageLength: data.image?.length || 0
+    });
+    
     const newMessage = new Message({
       senderId: data.senderId,
       receiverId: data.receiverId,
       text: data.text,
       image: data.image,
     });
-    await newMessage.save();
-    io.to(data.receiverId).to(data.senderId).emit("receive_message", newMessage);
+    
+    try {
+      await newMessage.save();
+      console.log("🔍 DEBUG - Message saved successfully:", newMessage._id);
+      io.to(data.receiverId).to(data.senderId).emit("receive_message", newMessage);
+    } catch (error) {
+      console.error("🔍 DEBUG - Error saving message:", error);
+    }
   });
 
   socket.on("delete_message", (data) => {

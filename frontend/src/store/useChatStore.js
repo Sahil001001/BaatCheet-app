@@ -65,6 +65,12 @@ export const useChatStore = create((set, get) => ({
       return;
     }
     
+    console.log("🔍 DEBUG - Sending message data:", {
+      text: messageData.text,
+      hasImage: !!messageData.image,
+      imageLength: messageData.image?.length || 0
+    });
+    
     const tempMessage = {
       _id: `temp_${Date.now()}`,
       senderId: authUser._id,
@@ -79,12 +85,19 @@ export const useChatStore = create((set, get) => ({
       messages: [...state.messages, tempMessage],
     }));
     
-    socket.emit("send_message", {
+    const socketData = {
       senderId: authUser._id,
       receiverId: selectedUser._id,
       text: messageData.text,
       image: messageData.image,
+    };
+    
+    console.log("🔍 DEBUG - Emitting socket data:", {
+      hasImage: !!socketData.image,
+      imageLength: socketData.image?.length || 0
     });
+    
+    socket.emit("send_message", socketData);
   },
 
   deleteMessage: async (messageId) => {
