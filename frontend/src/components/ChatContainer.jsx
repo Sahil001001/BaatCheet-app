@@ -195,32 +195,58 @@ const ChatContainer = () => {
         const msg = messages.find(m => m._id === contextMenu.messageId);
         if (!msg) return null;
         const isSender = msg.senderId === authUser._id;
+        
+        // Calculate position to keep menu within screen bounds
+        const menuWidth = 180;
+        const menuHeight = isSender ? 80 : 40;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        let x = contextMenu.x;
+        let y = contextMenu.y;
+        
+        // Adjust horizontal position
+        if (x + menuWidth > screenWidth) {
+          x = screenWidth - menuWidth - 10;
+        }
+        if (x < 10) {
+          x = 10;
+        }
+        
+        // Adjust vertical position
+        if (y + menuHeight > screenHeight) {
+          y = screenHeight - menuHeight - 10;
+        }
+        if (y < 10) {
+          y = 10;
+        }
+        
         return (
           <div
             className="fixed z-50"
-            style={{ left: contextMenu.x, top: contextMenu.y }}
+            style={{ left: x, top: y }}
           >
-            <div className="bg-white rounded shadow-lg border px-4 py-2 min-w-[180px] flex flex-col gap-1">
+            <div className="bg-white rounded-lg shadow-xl border border-gray-200 px-3 py-2 min-w-[180px] flex flex-col gap-1">
               <div
-                className="flex items-center gap-2 cursor-pointer hover:bg-red-50 px-2 py-1 rounded"
+                className="flex items-center gap-3 cursor-pointer hover:bg-red-50 px-3 py-2 rounded-md transition-colors"
                 onClick={() => {
                   deleteMessageForMe(contextMenu.messageId);
                   setContextMenu({ visible: false, x: 0, y: 0, messageId: null });
                 }}
               >
                 <Trash2 size={18} className="text-red-500" />
-                <span className="text-red-600 font-medium">Delete for me</span>
+                <span className="text-red-600 font-medium text-sm">Delete for me</span>
               </div>
               {isSender && (
                 <div
-                  className="flex items-center gap-2 cursor-pointer hover:bg-red-50 px-2 py-1 rounded"
+                  className="flex items-center gap-3 cursor-pointer hover:bg-red-50 px-3 py-2 rounded-md transition-colors"
                   onClick={() => {
                     deleteMessage(contextMenu.messageId);
                     setContextMenu({ visible: false, x: 0, y: 0, messageId: null });
                   }}
                 >
                   <Trash2 size={18} className="text-red-500" />
-                  <span className="text-red-600 font-medium">Delete for everyone</span>
+                  <span className="text-red-600 font-medium text-sm">Delete for everyone</span>
                 </div>
               )}
             </div>

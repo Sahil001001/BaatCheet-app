@@ -37,12 +37,17 @@ const MessageInput = () => {
 
     let imageBase64 = null;
     if (imageFile) {
-      imageBase64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(imageFile);
-      });
+      try {
+        imageBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(imageFile);
+        });
+      } catch (error) {
+        toast.error("Failed to process image. Please try again.");
+        return;
+      }
     }
 
     try {
@@ -56,7 +61,7 @@ const MessageInput = () => {
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      // No console.error statements in this file
+      toast.error("Failed to send message. Please try again.");
     }
   };
 
